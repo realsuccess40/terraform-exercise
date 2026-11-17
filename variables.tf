@@ -1,6 +1,6 @@
 variable "key_name" {
-description = "the ssh key pair name"
-type = string
-default = "edu-keypair"
+  description = "the ssh key pair name"
+  type        = string
+  default     = "edu-keypair"
 
 }
