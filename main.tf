@@ -49,7 +49,7 @@ resource "aws_subnet" "App-Private-A" {
 
   tags = {
     Name  = "App-Private-A"
-    Evn   = "Prod"
+    Env   = "Prod"
     Owner = "success"
   }
 }
@@ -62,7 +62,7 @@ resource "aws_subnet" "App-Private-B" {
 
   tags = {
     Name  = "App-Private-B"
-    Evn   = "Prod"
+    Env   = "Prod"
     Owner = "success"
   }
 }
@@ -75,7 +75,7 @@ resource "aws_subnet" "DB-Private-A" {
 
   tags = {
     Name  = "DB-Private-A"
-    Evn   = "Prod"
+    Env   = "Prod"
     Owner = "success"
   }
 }
@@ -88,7 +88,7 @@ resource "aws_subnet" "DB-Private-B" {
 
   tags = {
     Name  = "DB-Private-B"
-    Evn   = "Prod"
+    Env   = "Prod"
     Owner = "success"
   }
 }
@@ -146,13 +146,23 @@ resource "aws_route_table" "PrivateRT" {
   vpc_id = aws_vpc.successlink-vpc.id
 
   route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_nat_gateway.successlink-NATGW.id
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.successlink-NATGW.id
   }
 
 
   tags = {
     Name = "PrivateRT"
+  }
+}
+
+# Create isolated database route table
+
+resource "aws_route_table" "DBRT" {
+  vpc_id = aws_vpc.successlink-vpc.id
+
+  tags = {
+    Name = "DBRT"
   }
 }
 
@@ -179,12 +189,12 @@ resource "aws_route_table_association" "Private_RT_Association_B" {
 
 resource "aws_route_table_association" "DB_RT_Association_A" {
   subnet_id      = aws_subnet.DB-Private-A.id
-  route_table_id = aws_route_table.PrivateRT.id
+  route_table_id = aws_route_table.DBRT.id
 }
 
 resource "aws_route_table_association" "DB_RT_Association_B" {
   subnet_id      = aws_subnet.DB-Private-B.id
-  route_table_id = aws_route_table.PrivateRT.id
+  route_table_id = aws_route_table.DBRT.id
 }
 
 
@@ -392,12 +402,4 @@ resource "aws_instance" "DB-VM" {
     Name = "DB-VM"
   }
 }
-
-resource "aws_s3_bucket" "successlink-bucket" {
-  bucket = "successlink-bucket"
-
-  tags = {
-    Name        = "successlink-bucket"
-    Environment = "Dev"
-  }
-}
+#
